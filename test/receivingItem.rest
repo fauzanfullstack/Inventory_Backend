@@ -1,0 +1,45 @@
+### ✅ Get all receiving items
+GET http://localhost:5000/api/receiving-items
+Content-Type: application/json
+
+###
+
+### ✅ Get receiving item by ID
+GET http://localhost:5000/api/receiving-items/1
+Content-Type: application/json
+
+###
+
+### ✅ Create new receiving items
+POST http://localhost:5000/api/receiving-items
+Content-Type: application/json
+
+{
+  "receiving_id": 1,
+  "item_id": 1,
+  "part_no": "PRT-001",
+  "qty": 10,
+  "unit_type": "PCS",
+  "price": 25000
+}
+
+###
+
+### ✅ Update receiving item
+PUT http://localhost:5000/api/receiving-items/1
+Content-Type: application/json
+
+{
+  "receiving_id": 1,
+  "item_id": 1,
+  "part_no": "PRT-001",
+  "qty": 20,
+  "unit_type": "PCS",
+  "price": 30000
+}
+
+###
+
+### ✅ Delete receiving item
+DELETE http://localhost:5000/api/receiving-items/1
+Content-Type: application/json

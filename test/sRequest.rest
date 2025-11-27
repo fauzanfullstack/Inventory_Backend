@@ -1,0 +1,33 @@
+### Get all
+GET http://localhost:5000/api/s-requests
+
+### Get by ID
+GET http://localhost:5000/api/s-requests/2
+
+### Create
+POST http://localhost:5000/api/s-requests
+Content-Type: application/json
+
+{
+  "number": "SR-001",
+  "documents": "DOC-001",
+  "status": "open",
+  "open_date": "2025-10-29",
+  "expected_date": "2025-11-01",
+  "cost_center": "CC-01",
+  "location": "Warehouse",
+  "request_by": "Fauzan",
+  "notes": "Test SR request"
+}
+
+### Update
+PUT http://localhost:5000/api/s-requests/1
+Content-Type: application/json
+
+{
+  "number": "SR-001-EDIT",
+  "status": "closed"
+}
+
+### Delete
+DELETE http://localhost:5000/api/s-requests/1

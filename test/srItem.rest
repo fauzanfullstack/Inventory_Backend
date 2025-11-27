@@ -1,0 +1,41 @@
+### Get all
+GET http://localhost:5000/api/sr-items
+Content-Type: application/json
+
+
+### Create
+POST http://localhost:5000/api/sr-items
+Content-Type: application/json
+
+{
+  "s_request_id": 2,
+  "item_id": 6,
+  "part_no": "FLT-098",
+  "qty": 10,
+  "unit_type": "PCS",
+  "notes": "Service Ac Lantai 8 kamar 810-816"
+}
+
+
+### Get by ID
+GET http://localhost:5000/api/sr-items/1
+Content-Type: application/json
+
+
+### Update
+PUT http://localhost:5000/api/sr-items/1
+Content-Type: application/json
+
+{
+  "s_request_id": 1,
+  "item_id": 1,
+  "part_no": "SR-ITEM-001-EDIT",
+  "qty": 10,
+  "unit_type": "PCS",
+  "notes": "Item diubah jumlahnya"
+}
+
+
+### Delete
+DELETE http://localhost:5000/api/sr-items/1
+Content-Type: application/json

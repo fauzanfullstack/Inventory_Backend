@@ -1,0 +1,61 @@
+### ==============================================
+### 🔍 GET semua Receiving
+### ==============================================
+GET http://localhost:5000/api/receivings
+Content-Type: application/json
+
+###
+
+### ==============================================
+### 🔍 GET Receiving berdasarkan ID
+### ==============================================
+GET http://localhost:5000/api/receivings/1
+Content-Type: application/json
+
+###
+
+### ==============================================
+### ➕ CREATE Receiving baru
+### ==============================================
+POST http://localhost:5000/api/receivings
+Content-Type: application/json
+
+{
+  "number": "RCV-001",
+  "document": "INV-001",
+  "status": "pending",
+  "location": "Gudang A",
+  "cost_center": "CC1001",
+  "supplier": "PT. Sumber Makmur",
+  "idr": 1500000,
+  "total": 1500000,
+  "notes": "Penerimaan barang pertama"
+}
+
+###
+
+### ==============================================
+### ✏️ UPDATE Receiving berdasarkan ID
+### ==============================================
+PUT http://localhost:5000/api/receivings/1
+Content-Type: application/json
+
+{
+  "number": "RCV-001",
+  "document": "INV-001A",
+  "status": "received",
+  "location": "Gudang A",
+  "cost_center": "CC1001",
+  "supplier": "PT. Sumber Makmur",
+  "idr": 1500000,
+  "total": 1500000,
+  "notes": "Sudah diterima oleh bagian gudang"
+}
+
+###
+
+### ==============================================
+### ❌ DELETE Receiving berdasarkan ID
+### ==============================================
+DELETE http://localhost:5000/api/receivings/1
+Content-Type: application/json

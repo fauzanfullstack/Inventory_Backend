@@ -1,0 +1,63 @@
+### ==============================================
+### 🔍 GET semua Purchase Request Items
+### ==============================================
+GET http://localhost:5000/api/purchase-request-items
+Content-Type: application/json
+
+###
+
+### ==============================================
+### 🔍 GET PR Item by ID
+### ==============================================
+GET http://localhost:5000/api/purchase-request-items/1
+Content-Type: application/json
+
+###
+
+### ==============================================
+### ➕ CREATE PR Item
+### ==============================================
+POST http://localhost:5000/api/purchase-request-items
+Content-Type: application/json
+
+{
+  "pr_id": 2,
+  "item_id": 6,
+  "part_no": "PR",
+  "description": "Pembelian Filter Udara",
+  "unit_type": "PCS",
+  "qty_f": 3,
+  "currency": "IDR",
+  "cost": 250000,
+  "team": "Enginering",
+  "due_date": "2025-11-01"
+}
+
+###
+
+### ==============================================
+### ✏️ UPDATE PR Item
+### ==============================================
+PUT http://localhost:5000/api/purchase-request-items/1
+Content-Type: application/json
+
+{
+  "pr_id": 1,
+  "item_id": 1,
+  "part_no": "PR-ITEM-001-REV",
+  "description": "Revisi pembelian kipas besar",
+  "unit_type": "PCS",
+  "qty_f": 5,
+  "currency": "IDR",
+  "cost": 300000,
+  "team": "Maintenance",
+  "due_date": "2025-11-02"
+}
+
+###
+
+### ==============================================
+### ❌ DELETE PR Item
+### ==============================================
+DELETE http://localhost:5000/api/purchase-request-items/3
+Content-Type: application/json

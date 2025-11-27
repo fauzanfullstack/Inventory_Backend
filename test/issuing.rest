@@ -1,0 +1,56 @@
+### ==============================================
+### 🔍 GET semua Issuing
+### ==============================================
+GET http://localhost:5000/api/issuings
+Content-Type: application/json
+
+###
+
+### ==============================================
+### 🔍 GET Issuing berdasarkan ID
+### ==============================================
+GET http://localhost:5000/api/issuings/1
+Content-Type: application/json
+
+###
+
+### ==============================================
+### ➕ CREATE Issuing baru
+### ==============================================
+POST http://localhost:5000/api/issuings
+Content-Type: application/json
+
+{
+  "staff": "Fauzan",
+  "number": "al-009",
+  "date": "2025-10-30",
+  "department": "IT",
+  "cost_center": "CC22",
+  "location": "Mulya Room",
+  "notes": "Biasa lah"
+}
+
+###
+
+### ==============================================
+### ✏️ UPDATE Issuing
+### ==============================================
+PUT http://localhost:5000/api/issuings/2
+Content-Type: application/json
+
+{
+  "staff": "Fauzan",
+  "number": "IS-001-REV",
+  "department": "General",
+  "cost_center": "CC001",
+  "location": "Gudang Utama",
+  "notes": "Revisi issuing"
+}
+
+###
+
+### ==============================================
+### ❌ DELETE Issuing
+### ==============================================
+DELETE http://localhost:5000/api/issuings/1
+Content-Type: application/json

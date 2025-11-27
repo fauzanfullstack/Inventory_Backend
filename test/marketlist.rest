@@ -1,0 +1,45 @@
+### GET semua marketlist
+GET http://localhost:5000/api/marketlists
+Content-Type: application/json
+
+
+### GET marketlist berdasarkan ID
+GET http://localhost:5000/api/marketlists/1
+Content-Type: application/json
+
+
+### CREATE marketlist baru
+POST http://localhost:5000/api/marketlists
+Content-Type: application/json
+
+{
+  "no": "ML-001",
+  "status": "open",
+  "open_date": "2025-10-29",
+  "cd": "CD-001",
+  "cost_center": "CC-IT",
+  "type_cost": "Operational",
+  "total": 1500000,
+  "notes": "Pengadaan alat kebersihan"
+}
+
+
+### UPDATE marketlist
+PUT http://localhost:5000/api/marketlists/1
+Content-Type: application/json
+
+{
+  "no": "ML-001-REV",
+  "status": "closed",
+  "open_date": "2025-10-29",
+  "cd": "CD-001",
+  "cost_center": "CC-IT",
+  "type_cost": "Maintenance",
+  "total": 2000000,
+  "notes": "Revisi pengadaan alat kebersihan"
+}
+
+
+### DELETE marketlist
+DELETE http://localhost:5000/api/marketlists/1
+Content-Type: application/json

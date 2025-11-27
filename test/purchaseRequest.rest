@@ -1,0 +1,47 @@
+### CREATE new Purchase Request (safe)
+POST http://localhost:5000/api/purchase-requests
+Content-Type: application/json
+
+{
+  "pr_number": "PR-2025-TEST",
+  "number": null,
+  "request_by": "Fauzan",
+  "department": "IT",
+  "status": "open",
+  "created_by": null
+}
+
+
+### GET all Purchase Requests
+GET http://localhost:5000/api/purchase-requests
+Accept: application/json
+
+### GET Purchase Request by ID
+GET http://localhost:5000/api/purchase-requests/1
+Accept: application/json
+
+### UPDATE Purchase Request
+PUT http://localhost:5000/api/purchase-requests/1
+Content-Type: application/json
+
+{
+  "pr_number": "PR-2025-TEST",
+  "item_id": null,
+  "part_no": null,
+  "description": "Updated test purchase request",
+  "unit_type": "pcs",
+  "qty_f": 10,
+  "currency": "IDR",
+  "cost": 12000,
+  "team": null,
+  "due_date": "2025-11-20",
+  "number": null,
+  "request_by": "Tester",
+  "department": "IT",
+  "status": "approved",
+  "updated_by": null
+}
+
+### DELETE Purchase Request
+DELETE http://localhost:5000/api/purchase-requests/1
+Accept: application/json

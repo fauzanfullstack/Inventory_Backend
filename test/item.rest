@@ -1,0 +1,41 @@
+### Get all items
+GET http://localhost:5000/api/items
+
+### Get item by ID
+GET http://localhost:5000/api/items/2
+
+### Create item
+POST http://localhost:5000/api/items
+Content-Type: application/json
+
+{
+  "part_no": "FLT-001",
+  "name": "Filter Oli",
+  "unit_type": "pcs",
+  "conversion": 1,
+  "unit": "pcs",
+  "qty": 15,
+  "aksi_centang": false,
+  "supplier": "PT. Sumber Rejeki",
+  "created_by": 1
+}
+
+
+### Update item
+PUT http://localhost:5000/api/items/1
+Content-Type: application/json
+
+{
+  "part_no": "FLT-002",
+  "name": "Filter Bensin",
+  "unit_type": "pcs",
+  "conversion": 4,
+  "unit": "pcs",
+  "qty": 13,
+  "aksi_centang": true,
+  "supplier": "PT. Sumber Rejeki",
+  "updated_by": 1
+}
+
+### Delete item
+DELETE http://localhost:5000/api/items/2

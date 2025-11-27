@@ -1,0 +1,55 @@
+### ==============================================
+### 🔍 GET semua issuing items
+### ==============================================
+GET http://localhost:5000/api/issuing-items
+Content-Type: application/json
+
+###
+
+### ==============================================
+### 🔍 GET issuing item by ID
+### ==============================================
+GET http://localhost:5000/api/issuing-items/1
+Content-Type: application/json
+
+###
+
+### ==============================================
+### ➕ CREATE issuing item
+### ==============================================
+POST http://localhost:5000/api/issuing-items
+Content-Type: application/json
+
+{
+  "issuing_id": 1,
+  "item_id": 1,
+  "part_no": "ITEM-001",
+  "qty": 5,
+  "unit_type": "PCS",
+  "notes": "Keluar untuk perbaikan AC"
+}
+
+###
+
+### ==============================================
+### ✏️ UPDATE issuing item
+### ==============================================
+PUT http://localhost:5000/api/issuing-items/1
+Content-Type: application/json
+
+{
+  "issuing_id": 1,
+  "item_id": 1,
+  "part_no": "ITEM",
+  "qty": 8,
+  "unit_type": "PCS",
+  "notes": "Jumlah direvisi"
+}
+
+###
+
+### ==============================================
+### ❌ DELETE issuing item
+### ==============================================
+DELETE http://localhost:5000/api/issuing-items/1
+Content-Type: application/json
