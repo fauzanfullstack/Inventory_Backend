@@ -1,5 +1,10 @@
+// src/controllers/purchaseRequest.controller.ts
 import { Request, Response } from "express";
 import pool from "../database/postgress";
+
+interface AuthRequest extends Request {
+  user?: { id: number; username: string; role: string };
+}
 
 // ======================================================
 // 🔧 Generate PR Number otomatis: PR-2025-0001
@@ -26,47 +31,68 @@ async function generatePRNumber() {
 }
 
 // ======================================================
-// ✅ Get all Purchase Requests
+// ✅ Get all Purchase Requests (publik bisa akses)
 // ======================================================
-export const getPurchaseRequests = async (req: Request, res: Response) => {
+export const getPurchaseRequests = async (req: AuthRequest, res: Response) => {
   try {
-    const result = await pool.query(
-      "SELECT * FROM purchase_requests ORDER BY id DESC"
-    );
+    let result;
+
+    if (req.user?.role === "admin") {
+      // Admin → semua PR
+      result = await pool.query("SELECT * FROM purchase_requests ORDER BY id DESC");
+    } else if (req.user) {
+      // User → hanya PR miliknya
+      result = await pool.query(
+        "SELECT * FROM purchase_requests WHERE created_by=$1 ORDER BY id DESC",
+        [req.user.id]
+      );
+    } else {
+      // Publik → tampilkan semua PR
+      result = await pool.query("SELECT * FROM purchase_requests ORDER BY id DESC");
+    }
+
     res.json(result.rows);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching purchase requests:", error);
-    res.status(500).json({ message: "Error fetching purchase requests", error });
+    res.status(500).json({ message: "Error fetching purchase requests", error: error.message });
   }
 };
 
 // ======================================================
-// ✅ Get Purchase Request by ID
+// ✅ Get Purchase Request by ID (publik bisa akses)
 // ======================================================
-export const getPurchaseRequestById = async (req: Request, res: Response) => {
+export const getPurchaseRequestById = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const result = await pool.query(
-      "SELECT * FROM purchase_requests WHERE id = $1",
-      [id]
-    );
+    const result = await pool.query("SELECT * FROM purchase_requests WHERE id = $1", [id]);
 
     if (result.rowCount === 0) {
       return res.status(404).json({ message: "Purchase request not found" });
     }
 
-    res.json(result.rows[0]);
-  } catch (error) {
+    const pr = result.rows[0];
+
+    if (!req.user || req.user?.role === "admin" || pr.created_by === req.user.id) {
+      // Publik / Admin / user pemilik → boleh akses
+      return res.json(pr);
+    }
+
+    return res.status(403).json({ message: "Access denied" });
+  } catch (error: any) {
     console.error("Error fetching purchase request:", error);
-    res.status(500).json({ message: "Error fetching purchase request", error });
+    res.status(500).json({ message: "Error fetching purchase request", error: error.message });
   }
 };
 
 // ======================================================
-// ✅ Create Purchase Request (AUTO pr_number + AUTO part_no)
+// ✅ Create Purchase Request (Admin/User, token wajib)
 // ======================================================
-export const createPurchaseRequest = async (req: Request, res: Response) => {
+export const createPurchaseRequest = async (req: AuthRequest, res: Response) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Token required to create PR" });
+    }
+
     const {
       item_id = null,
       description = null,
@@ -80,25 +106,18 @@ export const createPurchaseRequest = async (req: Request, res: Response) => {
       request_by = null,
       department = null,
       status = "open",
-      created_by = null
     } = req.body;
 
-    // 🔥 part 1: generate pr_number otomatis
+    const created_by = req.user.id;
+
     const pr_number = await generatePRNumber();
 
-    // 🔥 part 2: ambil part_no dari tabel items otomatis
     let part_no = null;
-
     if (item_id) {
-      const item = await pool.query(
-        "SELECT part_no FROM items WHERE id = $1",
-        [item_id]
-      );
-
+      const item = await pool.query("SELECT part_no FROM items WHERE id = $1", [item_id]);
       if (item.rowCount === 0) {
         return res.status(404).json({ message: "Item not found" });
       }
-
       part_no = item.rows[0].part_no;
     }
 
@@ -129,20 +148,20 @@ export const createPurchaseRequest = async (req: Request, res: Response) => {
     res.status(201).json(result.rows[0]);
   } catch (error: any) {
     console.error("Error creating purchase request:", error.message);
-    res.status(500).json({
-      message: "Error creating purchase request",
-      error: error.message,
-    });
+    res.status(500).json({ message: "Error creating purchase request", error: error.message });
   }
 };
 
 // ======================================================
-// ✅ Update Purchase Request
+// ✅ Update Purchase Request (Admin Only)
 // ======================================================
-export const updatePurchaseRequest = async (req: Request, res: Response) => {
+export const updatePurchaseRequest = async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params;
+    if (!req.user || req.user.role !== "admin") {
+      return res.status(403).json({ message: "Only admin can update PR" });
+    }
 
+    const { id } = req.params;
     const {
       pr_number,
       item_id,
@@ -158,8 +177,14 @@ export const updatePurchaseRequest = async (req: Request, res: Response) => {
       request_by,
       department,
       status,
-      updated_by
     } = req.body;
+
+    const updated_by = req.user.id;
+
+    const check = await pool.query("SELECT * FROM purchase_requests WHERE id=$1", [id]);
+    if (check.rowCount === 0) {
+      return res.status(404).json({ message: "Purchase request not found" });
+    }
 
     const result = await pool.query(
       `UPDATE purchase_requests SET
@@ -201,24 +226,23 @@ export const updatePurchaseRequest = async (req: Request, res: Response) => {
       ]
     );
 
-    if (result.rowCount === 0) {
-      return res.status(404).json({ message: "Purchase request not found" });
-    }
-
     res.json(result.rows[0]);
-  } catch (error) {
-    console.error("Error updating purchase request:", error);
-    res.status(500).json({ message: "Error updating purchase request", error });
+  } catch (error: any) {
+    console.error("Error updating purchase request:", error.message);
+    res.status(500).json({ message: "Error updating purchase request", error: error.message });
   }
 };
 
 // ======================================================
-// ❌ Delete Purchase Request
+// ❌ Delete Purchase Request (Admin Only)
 // ======================================================
-export const deletePurchaseRequest = async (req: Request, res: Response) => {
+export const deletePurchaseRequest = async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params;
+    if (!req.user || req.user.role !== "admin") {
+      return res.status(403).json({ message: "Only admin can delete PR" });
+    }
 
+    const { id } = req.params;
     const result = await pool.query(
       "DELETE FROM purchase_requests WHERE id = $1 RETURNING *",
       [id]
@@ -228,12 +252,9 @@ export const deletePurchaseRequest = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Purchase request not found" });
     }
 
-    res.json({
-      message: "Purchase request deleted successfully",
-      pr: result.rows[0],
-    });
-  } catch (error) {
-    console.error("Error deleting purchase request:", error);
-    res.status(500).json({ message: "Error deleting purchase request", error });
+    res.json({ message: "Purchase request deleted successfully", pr: result.rows[0] });
+  } catch (error: any) {
+    console.error("Error deleting purchase request:", error.message);
+    res.status(500).json({ message: "Error deleting purchase request", error: error.message });
   }
 };

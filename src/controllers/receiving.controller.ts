@@ -50,24 +50,29 @@ export const createReceiving = async (req: Request, res: Response) => {
       notes,
       item_name,
       condition_status,
+      unit_type,
+      qty,
+      created_by,
     } = req.body;
 
-    const idrNum = Number(idr);
-    const totalNum = Number(total);
-
-    if (isNaN(idrNum) || isNaN(totalNum)) {
-      return res.status(400).json({ message: "Field 'idr' dan 'total' harus angka!" });
+    // Validasi item_name
+    if (!item_name || item_name.trim() === "") {
+      return res.status(400).json({ message: "Field 'item_name' wajib diisi!" });
     }
 
-    // FILE → documentation
+    const idrNum = parseFloat(idr) || 0;
+    const totalNum = parseFloat(total) || 0;
+    const qtyNum = parseInt(qty) || 0;
+
     const documentation = req.file
       ? `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`
       : null;
 
     const result = await pool.query(
       `INSERT INTO receivings 
-        (number, document, status, location, cost_center, supplier, idr, total, notes, item_name, condition_status, documentation)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
+        (number, document, status, location, cost_center, supplier, idr, total, notes,
+         item_name, condition_status, unit_type, qty, documentation, created_by)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
        RETURNING *`,
       [
         number,
@@ -80,8 +85,11 @@ export const createReceiving = async (req: Request, res: Response) => {
         totalNum,
         notes,
         item_name,
-        condition_status,
+        condition_status || null,
+        unit_type || null,
+        qtyNum,
         documentation,
+        created_by || "Unknown",
       ]
     );
 
@@ -98,7 +106,6 @@ export const createReceiving = async (req: Request, res: Response) => {
 export const updateReceiving = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-
     const {
       number,
       document,
@@ -111,26 +118,42 @@ export const updateReceiving = async (req: Request, res: Response) => {
       notes,
       item_name,
       condition_status,
+      unit_type,
+      qty,
+      updated_by,
     } = req.body;
 
-    const idrNum = Number(idr);
-    const totalNum = Number(total);
-
-    if (isNaN(idrNum) || isNaN(totalNum)) {
-      return res.status(400).json({ message: "Field 'idr' dan 'total' harus angka!" });
+    if (!item_name || item_name.trim() === "") {
+      return res.status(400).json({ message: "Field 'item_name' wajib diisi!" });
     }
 
-    // file baru → pakai filename
+    const idrNum = parseFloat(idr) || 0;
+    const totalNum = parseFloat(total) || 0;
+    const qtyNum = parseInt(qty) || 0;
+
     const newFile = req.file
       ? `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`
       : null;
 
     const result = await pool.query(
       `UPDATE receivings
-       SET number=$1, document=$2, status=$3, location=$4, cost_center=$5, supplier=$6,
-           idr=$7, total=$8, notes=$9, item_name=$10, condition_status=$11,
-           documentation = COALESCE($12, documentation)
-       WHERE id=$13
+       SET number=$1,
+           document=$2,
+           status=$3,
+           location=$4,
+           cost_center=$5,
+           supplier=$6,
+           idr=$7,
+           total=$8,
+           notes=$9,
+           item_name=$10,
+           condition_status=$11,
+           unit_type=$12,
+           qty=$13,
+           documentation = COALESCE($14, documentation),
+           updated_by = $15,
+           updated_at = NOW()
+       WHERE id=$16
        RETURNING *`,
       [
         number,
@@ -143,8 +166,11 @@ export const updateReceiving = async (req: Request, res: Response) => {
         totalNum,
         notes,
         item_name,
-        condition_status,
+        condition_status || null,
+        unit_type || null,
+        qtyNum,
         newFile,
+        updated_by || "Unknown",
         id,
       ]
     );

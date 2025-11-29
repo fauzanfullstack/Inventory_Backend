@@ -7,15 +7,12 @@ import {
   deleteSRequest,
 } from "../controllers/sRequest.controller";
 
-import upload from "../middleware/upload";
-
 const router: Router = Router();
 
 /**
- * CREATE SRequest (dengan upload file)
- * Field file input: "documentation"
+ * CREATE SRequest (tanpa upload file)
  */
-router.post("/", upload.single("documentation"), createSRequest);
+router.post("/", createSRequest);
 
 /**
  * GET semua s_requests
@@ -28,9 +25,9 @@ router.get("/", getSRequests);
 router.get("/:id", getSRequestById);
 
 /**
- * UPDATE s_request (boleh upload file baru)
+ * UPDATE s_request (tanpa upload file)
  */
-router.put("/:id", upload.single("documentation"), updateSRequest);
+router.put("/:id", updateSRequest);
 
 /**
  * DELETE s_request

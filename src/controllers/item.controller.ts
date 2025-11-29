@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import pool from "../database/postgress";
 
 // ======================================================
-// GET ALL ITEMS (rapi + urutan kolom estetik)
+// GET ALL ITEMS
 // ======================================================
 export const getItems = async (req: Request, res: Response) => {
   try {
@@ -39,7 +39,8 @@ export const getItemById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const result = await pool.query(`
+    const result = await pool.query(
+      `
       SELECT
         id,
         part_no,
@@ -56,7 +57,9 @@ export const getItemById = async (req: Request, res: Response) => {
         updated_at
       FROM items
       WHERE id = $1
-    `, [id]);
+      `,
+      [id]
+    );
 
     if (result.rowCount === 0) {
       return res.status(404).json({ message: "Item not found" });
@@ -70,7 +73,7 @@ export const getItemById = async (req: Request, res: Response) => {
 };
 
 // ======================================================
-// CREATE ITEM (with supplier + created_by real)
+// CREATE ITEM
 // ======================================================
 export const createItem = async (req: Request, res: Response) => {
   try {
@@ -83,7 +86,7 @@ export const createItem = async (req: Request, res: Response) => {
       qty,
       aksi_centang,
       supplier,
-      created_by
+      created_by,
     } = req.body;
 
     const result = await pool.query(
@@ -93,15 +96,15 @@ export const createItem = async (req: Request, res: Response) => {
        RETURNING *
       `,
       [
-        part_no,
-        name,
-        supplier || null,
+        part_no || null,
+        name || null,
+        supplier ?? null,
         unit_type || null,
-        conversion || 1,
-        unit || null,
-        qty || 0,
-        aksi_centang || false,
-        created_by || null,
+        conversion ?? 1,
+        unit ?? null,
+        qty ?? 0,
+        aksi_centang ?? false,
+        created_by ?? '', // default string kosong supaya tidak null
       ]
     );
 
@@ -113,7 +116,10 @@ export const createItem = async (req: Request, res: Response) => {
 };
 
 // ======================================================
-// UPDATE ITEM (with supplier)
+// UPDATE ITEM
+// ======================================================
+// ======================================================
+// UPDATE ITEM
 // ======================================================
 export const updateItem = async (req: Request, res: Response) => {
   try {
@@ -128,8 +134,20 @@ export const updateItem = async (req: Request, res: Response) => {
       qty,
       aksi_centang,
       supplier,
-      updated_by
+      updated_by,
     } = req.body;
+
+    // Ambil data lama dulu supaya bisa COALESCE updated_by jika tidak dikirim
+    const oldResult = await pool.query(
+      `SELECT updated_by FROM items WHERE id = $1`,
+      [id]
+    );
+
+    if (oldResult.rowCount === 0) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+
+    const currentUpdatedBy = oldResult.rows[0].updated_by;
 
     const result = await pool.query(
       `UPDATE items
@@ -142,7 +160,7 @@ export const updateItem = async (req: Request, res: Response) => {
          unit         = COALESCE($6, unit),
          qty          = COALESCE($7, qty),
          aksi_centang = COALESCE($8, aksi_centang),
-         updated_by   = $9,
+         updated_by   = COALESCE($9, updated_by),
          updated_at   = NOW()
        WHERE id = $10
        RETURNING *
@@ -156,14 +174,10 @@ export const updateItem = async (req: Request, res: Response) => {
         unit ?? null,
         qty ?? null,
         aksi_centang ?? null,
-        updated_by || null,
+        updated_by ?? currentUpdatedBy, // pakai data lama jika tidak dikirim
         id,
       ]
     );
-
-    if (result.rowCount === 0) {
-      return res.status(404).json({ message: "Item not found" });
-    }
 
     res.json(result.rows[0]);
   } catch (error) {
@@ -171,6 +185,7 @@ export const updateItem = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error updating item" });
   }
 };
+
 
 // ======================================================
 // DELETE ITEM

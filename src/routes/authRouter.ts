@@ -1,16 +1,14 @@
-// src/routes/authRouter.ts
 import express, { Router } from "express";
 import { register, login, getUsers } from "../controllers/auth.controller";
+import { authenticateToken, isAdmin } from "../middleware/authMiddleware";
 
 const router: Router = express.Router();
 
-// REGISTER
+// REGISTER & LOGIN tetap publik
 router.post("/register", register);
-
-// LOGIN
 router.post("/login", login);
 
-// GET ALL USERS
-router.get("/users", getUsers);
+// GET ALL USERS → cuma admin yang bisa akses
+router.get("/users", authenticateToken, isAdmin, getUsers);
 
 export { router as authRoutes };
