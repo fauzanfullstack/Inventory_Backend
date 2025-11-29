@@ -118,9 +118,9 @@ export const login = async (req: Request, res: Response) => {
 export const getUsers = async (req: Request, res: Response) => {
   try {
     const users = await pool.query(
-      `SELECT id, username, full_name, email, role, created_at
+      `SELECT id, username, full_name, email, role, created_at, updated_at
        FROM users
-       ORDER BY id DESC`
+       ORDER BY created_at DESC`
     );
 
     return res.status(200).json(users.rows);
@@ -128,5 +128,155 @@ export const getUsers = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error("🔥 Error get users:", error);
     return res.status(500).json({ message: "Error mengambil data user", error: error.message });
+  }
+};
+
+// ===============================
+// GET USER BY ID
+// ===============================
+export const getUserById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const userResult = await pool.query(
+      `SELECT id, username, full_name, email, role, created_at, updated_at
+       FROM users
+       WHERE id = $1`,
+      [id]
+    );
+
+    if (userResult.rowCount === 0) {
+      return res.status(404).json({ message: "User tidak ditemukan" });
+    }
+
+    return res.status(200).json(userResult.rows[0]);
+
+  } catch (error: any) {
+    console.error("🔥 Error get user by ID:", error);
+    return res.status(500).json({ message: "Error mengambil data user", error: error.message });
+  }
+};
+
+// ===============================
+// UPDATE USER
+// ===============================
+export const updateUser = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { username, full_name, email, password, role } = req.body;
+
+    // Cek apakah user ada
+    const userCheck = await pool.query(
+      "SELECT id FROM users WHERE id = $1",
+      [id]
+    );
+
+    if (userCheck.rowCount === 0) {
+      return res.status(404).json({ message: "User tidak ditemukan" });
+    }
+
+    // Cek apakah username sudah dipakai user lain
+    if (username) {
+      const usernameCheck = await pool.query(
+        "SELECT id FROM users WHERE LOWER(username)=LOWER($1) AND id != $2",
+        [username, id]
+      );
+      if (usernameCheck.rowCount! > 0) {
+        return res.status(400).json({ message: "Username sudah digunakan user lain" });
+      }
+    }
+
+    // Cek apakah email sudah dipakai user lain
+    if (email) {
+      const emailCheck = await pool.query(
+        "SELECT id FROM users WHERE LOWER(email)=LOWER($1) AND id != $2",
+        [email, id]
+      );
+      if (emailCheck.rowCount! > 0) {
+        return res.status(400).json({ message: "Email sudah digunakan user lain" });
+      }
+    }
+
+    // Validasi role
+    const allowedRoles = ["user", "admin"];
+    const userRole = role && allowedRoles.includes(role) ? role : undefined;
+
+    // Siapkan query update
+    let updateQuery = `UPDATE users SET updated_at = NOW()`;
+    const updateValues: any[] = [];
+    let paramCount = 1;
+
+    if (username) {
+      updateQuery += `, username = $${paramCount}`;
+      updateValues.push(username);
+      paramCount++;
+    }
+
+    if (full_name) {
+      updateQuery += `, full_name = $${paramCount}`;
+      updateValues.push(full_name);
+      paramCount++;
+    }
+
+    if (email) {
+      updateQuery += `, email = $${paramCount}`;
+      updateValues.push(email);
+      paramCount++;
+    }
+
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      updateQuery += `, password = $${paramCount}`;
+      updateValues.push(hashedPassword);
+      paramCount++;
+    }
+
+    if (userRole) {
+      updateQuery += `, role = $${paramCount}`;
+      updateValues.push(userRole);
+      paramCount++;
+    }
+
+    updateQuery += ` WHERE id = $${paramCount} RETURNING id, username, full_name, email, role, updated_at`;
+    updateValues.push(id);
+
+    const result = await pool.query(updateQuery, updateValues);
+
+    return res.status(200).json({
+      message: "User berhasil diupdate",
+      user: result.rows[0],
+    });
+
+  } catch (error: any) {
+    console.error("🔥 Error update user:", error);
+    return res.status(500).json({ message: "Error update user", error: error.message });
+  }
+};
+
+// ===============================
+// DELETE USER
+// ===============================
+export const deleteUser = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    // Cek apakah user ada
+    const userCheck = await pool.query(
+      "SELECT id FROM users WHERE id = $1",
+      [id]
+    );
+
+    if (userCheck.rowCount === 0) {
+      return res.status(404).json({ message: "User tidak ditemukan" });
+    }
+
+    // Hapus user
+    await pool.query("DELETE FROM users WHERE id = $1", [id]);
+
+    return res.status(200).json({ message: "User berhasil dihapus" });
+
+  } catch (error: any) {
+    console.error("🔥 Error delete user:", error);
+    return res.status(500).json({ message: "Error delete user", error: error.message });
   }
 };
