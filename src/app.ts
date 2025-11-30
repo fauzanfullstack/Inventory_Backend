@@ -27,9 +27,8 @@ app.use(express.json());
 // ===============================
 // STATIC FOLDER UNTUK FOTO UPLOAD
 // ===============================
-// ini akan menampilkan file di src/uploads
-// akses di frontend: http://localhost:5000/uploads/namafile.jpg
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// ✅ FIX: Pakai process.cwd() bukan __dirname
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Route utama
 app.use("/", routes);

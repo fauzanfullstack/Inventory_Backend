@@ -4,7 +4,6 @@ import pool from "../database/postgress";
 // Helper
 const formatRow = (row: any) => {
   const formatted = { ...row };
-  // Parse items jika ada
   if (formatted.items && typeof formatted.items === 'string') {
     try {
       formatted.items = JSON.parse(formatted.items);
@@ -16,7 +15,7 @@ const formatRow = (row: any) => {
 };
 
 // =============================================
-// ✅ GET ALL SREQUESTS
+// GET ALL SREQUESTS
 // =============================================
 export const getSRequests = async (_req: Request, res: Response) => {
   try {
@@ -29,13 +28,10 @@ export const getSRequests = async (_req: Request, res: Response) => {
 };
 
 // =============================================
-// ✅ CREATE SREQUEST
+// CREATE SREQUEST
 // =============================================
 export const createSRequest = async (req: Request, res: Response) => {
   try {
-    console.log("=== CREATE SREQUEST DEBUG ===");
-    console.log("Request body:", JSON.stringify(req.body, null, 2));
-    
     const {
       number,
       status,
@@ -47,54 +43,27 @@ export const createSRequest = async (req: Request, res: Response) => {
       notes,
       created_by,
       updated_by,
-      items, // array of {name, qty}
+      items,
     } = req.body;
-
-    console.log("Extracted values:", {
-      number,
-      status,
-      open_date,
-      expected_date,
-      cost_center,
-      location,
-      request_by,
-      notes,
-      created_by,
-      updated_by,
-      items
-    });
 
     // Validasi field required
     if (!number || !open_date || !expected_date || !cost_center || !location || !request_by) {
-      console.log("Validation failed - missing required fields");
-      console.log("Check:", {
-        hasNumber: !!number,
-        hasOpenDate: !!open_date,
-        hasExpectedDate: !!expected_date,
-        hasCostCenter: !!cost_center,
-        hasLocation: !!location,
-        hasRequestBy: !!request_by
-      });
       return res.status(400).json({ message: "Field required tidak boleh kosong" });
     }
 
     // Validasi items
     if (!items || !Array.isArray(items) || items.length === 0) {
-      console.log("Validation failed - items invalid");
       return res.status(400).json({ message: "Items harus diisi minimal 1" });
     }
 
     // Validasi setiap item
     for (const item of items) {
       if (!item.name || !item.qty || item.qty < 1) {
-        console.log("Validation failed - invalid item:", item);
         return res.status(400).json({ 
           message: "Setiap item harus memiliki name dan qty minimal 1" 
         });
       }
     }
-
-    console.log("All validations passed, inserting to database...");
 
     const result = await pool.query(
       `INSERT INTO s_requests 
@@ -116,7 +85,6 @@ export const createSRequest = async (req: Request, res: Response) => {
       ]
     );
 
-    console.log("Insert successful!");
     res.status(201).json(formatRow(result.rows[0]));
   } catch (error) {
     console.error("Error creating service request:", error);
@@ -125,7 +93,7 @@ export const createSRequest = async (req: Request, res: Response) => {
 };
 
 // =============================================
-// ✅ GET SREQUEST BY ID
+// GET SREQUEST BY ID
 // =============================================
 export const getSRequestById = async (req: Request, res: Response) => {
   try {
@@ -144,10 +112,14 @@ export const getSRequestById = async (req: Request, res: Response) => {
 };
 
 // =============================================
-// ✅ UPDATE SREQUEST
+// UPDATE SREQUEST + AUTO DEDUCT STOCK
 // =============================================
 export const updateSRequest = async (req: Request, res: Response) => {
+  const client = await pool.connect();
+
   try {
+    await client.query("BEGIN");
+
     const { id } = req.params;
     const {
       number,
@@ -159,29 +131,93 @@ export const updateSRequest = async (req: Request, res: Response) => {
       request_by,
       notes,
       updated_by,
-      items, // array of {name, qty}
+      items,
     } = req.body;
 
     // Validasi field required
     if (!number || !open_date || !expected_date || !cost_center || !location || !request_by) {
+      await client.query("ROLLBACK");
       return res.status(400).json({ message: "Field required tidak boleh kosong" });
     }
 
     // Validasi items
     if (!items || !Array.isArray(items) || items.length === 0) {
+      await client.query("ROLLBACK");
       return res.status(400).json({ message: "Items harus diisi minimal 1" });
     }
 
     // Validasi setiap item
     for (const item of items) {
       if (!item.name || !item.qty || item.qty < 1) {
+        await client.query("ROLLBACK");
         return res.status(400).json({ 
           message: "Setiap item harus memiliki name dan qty minimal 1" 
         });
       }
     }
 
-    const result = await pool.query(
+    // Get old service request data
+    const oldSRequest = await client.query(
+      `SELECT * FROM s_requests WHERE id = $1`,
+      [id]
+    );
+
+    if (oldSRequest.rows.length === 0) {
+      await client.query("ROLLBACK");
+      return res.status(404).json({ message: "Service request not found" });
+    }
+
+    const oldData = oldSRequest.rows[0];
+    const oldStatus = oldData.status;
+
+    // AUTO DEDUCT STOCK jika status berubah dari non-approved → approved
+    if (oldStatus !== "approved" && status === "approved") {
+      console.log("🔄 Auto deducting stock for approved service request...");
+
+      for (const requestItem of items) {
+        const itemName = requestItem.name.trim();
+        const requestQty = parseInt(requestItem.qty) || 0;
+
+        if (requestQty <= 0) continue;
+
+        // Cari item di database (case-insensitive)
+        const itemNameClean = itemName.toLowerCase();
+        const itemResult = await client.query(
+          `SELECT * FROM items WHERE LOWER(TRIM(name)) = $1`,
+          [itemNameClean]
+        );
+
+        if (itemResult.rows.length === 0) {
+          await client.query("ROLLBACK");
+          return res.status(400).json({ 
+            message: `Item '${itemName}' tidak ditemukan di master data items!` 
+          });
+        }
+
+        const item = itemResult.rows[0];
+        const currentQty = item.qty || 0;
+        const newQty = currentQty - requestQty;
+
+        // Validasi stock cukup
+        if (newQty < 0) {
+          await client.query("ROLLBACK");
+          return res.status(400).json({ 
+            message: `Stock '${itemName}' tidak cukup! (Tersedia: ${currentQty}, Diminta: ${requestQty})` 
+          });
+        }
+
+        // Update stock
+        await client.query(
+          `UPDATE items SET qty = $1, updated_at = NOW() WHERE id = $2`,
+          [newQty, item.id]
+        );
+
+        console.log(`✅ Stock deducted: ${item.name} (${currentQty} → ${newQty})`);
+      }
+    }
+
+    // Update service request
+    const result = await client.query(
       `UPDATE s_requests
        SET number=$1, status=$2, open_date=$3, expected_date=$4, cost_center=$5,
            location=$6, request_by=$7, notes=$8, updated_by=$9, items=$10, updated_at=NOW()
@@ -201,19 +237,19 @@ export const updateSRequest = async (req: Request, res: Response) => {
       ]
     );
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "Service request not found" });
-    }
-
+    await client.query("COMMIT");
     res.json(formatRow(result.rows[0]));
   } catch (error) {
+    await client.query("ROLLBACK");
     console.error("Error updating service request:", error);
-    res.status(500).json({ message: "Error updating service request" });
+    res.status(500).json({ message: error instanceof Error ? error.message : "Error updating service request" });
+  } finally {
+    client.release();
   }
 };
 
 // =============================================
-// ✅ DELETE SREQUEST
+// DELETE SREQUEST
 // =============================================
 export const deleteSRequest = async (req: Request, res: Response) => {
   try {
