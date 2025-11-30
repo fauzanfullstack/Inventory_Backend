@@ -163,13 +163,7 @@ maka akan muncul data json seperti ini
 
 📸 Dokumentasi ERD
 <img width="630" height="805" alt="erd ozan" src="https://github.com/user-attachments/assets/fcd4dc7c-9d5a-44ff-b087-db6dc31febf8" />
-📄 Download ERD (PDF)
-https://github.com/user-attachments/files/23840150/ERD.inv.Fauzan.pdf
 
-👤 Author
-Fauzan Permana
-Full Stack Developer
-📧 Contact via GitHub / WA / Email
 
 🚀 Selesai! 
 
