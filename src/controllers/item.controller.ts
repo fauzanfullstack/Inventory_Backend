@@ -1,9 +1,7 @@
 import { Request, Response } from "express";
 import pool from "../database/postgress";
 
-// ======================================================
 // GET ALL ITEMS
-// ======================================================
 export const getItems = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(`
@@ -32,9 +30,9 @@ export const getItems = async (req: Request, res: Response) => {
   }
 };
 
-// ======================================================
+
 // GET ONE ITEM
-// ======================================================
+
 export const getItemById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -72,9 +70,8 @@ export const getItemById = async (req: Request, res: Response) => {
   }
 };
 
-// ======================================================
 // CREATE ITEM
-// ======================================================
+
 export const createItem = async (req: Request, res: Response) => {
   try {
     const {
@@ -115,12 +112,10 @@ export const createItem = async (req: Request, res: Response) => {
   }
 };
 
-// ======================================================
+
+
 // UPDATE ITEM
-// ======================================================
-// ======================================================
-// UPDATE ITEM
-// ======================================================
+
 export const updateItem = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -187,9 +182,7 @@ export const updateItem = async (req: Request, res: Response) => {
 };
 
 
-// ======================================================
 // DELETE ITEM
-// ======================================================
 export const deleteItem = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;

@@ -6,9 +6,7 @@ import jwt from "jsonwebtoken";
 
 const JWT_SECRET = "secret_key_123";
 
-// ===============================
 // REGISTER USER
-// ===============================
 export const register = async (req: Request, res: Response) => {
   try {
     const { username, full_name, email, password, role } = req.body;
@@ -60,9 +58,8 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 
-// ===============================
+
 // LOGIN USER
-// ===============================
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
@@ -112,9 +109,8 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-// ===============================
+
 // GET ALL USERS
-// ===============================
 export const getUsers = async (req: Request, res: Response) => {
   try {
     const users = await pool.query(
@@ -131,9 +127,8 @@ export const getUsers = async (req: Request, res: Response) => {
   }
 };
 
-// ===============================
+
 // GET USER BY ID
-// ===============================
 export const getUserById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -157,9 +152,8 @@ export const getUserById = async (req: Request, res: Response) => {
   }
 };
 
-// ===============================
+
 // UPDATE USER
-// ===============================
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -253,9 +247,8 @@ export const updateUser = async (req: Request, res: Response) => {
   }
 };
 
-// ===============================
+
 // DELETE USER
-// ===============================
 export const deleteUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;

@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 import pool from "../database/postgress";
 
-// ===============================
+
 // GET ALL ISSUING ITEMS
-// ===============================
 export const getAllIssuingItems = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
@@ -16,9 +15,9 @@ export const getAllIssuingItems = async (req: Request, res: Response) => {
   }
 };
 
-// ===============================
+
 // GET ISSUING ITEMS BY ISSUING ID
-// ===============================
+
 export const getIssuingItemsByIssuingId = async (req: Request, res: Response) => {
   try {
     const { issuing_id } = req.params;
@@ -35,9 +34,9 @@ export const getIssuingItemsByIssuingId = async (req: Request, res: Response) =>
   }
 };
 
-// ===============================
+
 // GET ONE ISSUING ITEM BY ID
-// ===============================
+
 export const getIssuingItemById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -57,9 +56,9 @@ export const getIssuingItemById = async (req: Request, res: Response) => {
   }
 };
 
-// ===============================
+
 // CREATE ISSUING ITEM
-// ===============================
+
 export const createIssuingItem = async (req: Request, res: Response) => {
   try {
     const { issuing_id, item_id, part_no, qty, unit_type, notes } = req.body;
@@ -91,9 +90,8 @@ export const createIssuingItem = async (req: Request, res: Response) => {
   }
 };
 
-// ===============================
+
 // UPDATE ISSUING ITEM (PARTIAL UPDATE)
-// ===============================
 export const updateIssuingItem = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -139,9 +137,8 @@ export const updateIssuingItem = async (req: Request, res: Response) => {
 };
 
 
-// ===============================
+
 // DELETE ISSUING ITEM
-// ===============================
 export const deleteIssuingItem = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;

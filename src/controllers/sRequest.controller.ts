@@ -14,9 +14,7 @@ const formatRow = (row: any) => {
   return formatted;
 };
 
-// =============================================
 // GET ALL SREQUESTS
-// =============================================
 export const getSRequests = async (_req: Request, res: Response) => {
   try {
     const result = await pool.query("SELECT * FROM s_requests ORDER BY id DESC");
@@ -27,9 +25,7 @@ export const getSRequests = async (_req: Request, res: Response) => {
   }
 };
 
-// =============================================
 // CREATE SREQUEST
-// =============================================
 export const createSRequest = async (req: Request, res: Response) => {
   try {
     const {
@@ -92,9 +88,7 @@ export const createSRequest = async (req: Request, res: Response) => {
   }
 };
 
-// =============================================
 // GET SREQUEST BY ID
-// =============================================
 export const getSRequestById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -111,9 +105,7 @@ export const getSRequestById = async (req: Request, res: Response) => {
   }
 };
 
-// =============================================
 // UPDATE SREQUEST + AUTO DEDUCT STOCK
-// =============================================
 export const updateSRequest = async (req: Request, res: Response) => {
   const client = await pool.connect();
 
@@ -248,9 +240,7 @@ export const updateSRequest = async (req: Request, res: Response) => {
   }
 };
 
-// =============================================
 // DELETE SREQUEST
-// =============================================
 export const deleteSRequest = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;

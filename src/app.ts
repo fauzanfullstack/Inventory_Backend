@@ -10,9 +10,7 @@ import pool from "./database/postgress";
 const app = express();
 const port = process.env.PORT || 5000;
 
-// ===============================
 // CORS FIX – WAJIB DI ATAS
-// ===============================
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -24,9 +22,7 @@ app.use(
 // Middleware json
 app.use(express.json());
 
-// ===============================
 // STATIC FOLDER UNTUK FOTO UPLOAD
-// ===============================
 // ✅ FIX: Pakai process.cwd() bukan __dirname
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 

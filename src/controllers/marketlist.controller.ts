@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 import pool from "../database/postgress";
 
-// ============================
+
 // Helper: Hitung status otomatis berdasarkan tanggal
-// ============================
 const getAutoStatus = (open_date: string, close_date: string, currentStatus?: string) => {
   const today = new Date().toISOString().split("T")[0]; // yyyy-mm-dd
 
@@ -18,9 +17,7 @@ const getAutoStatus = (open_date: string, close_date: string, currentStatus?: st
   return currentStatus || "pending";
 };
 
-// ============================
 // Get all marketlists with item info
-// ============================
 export const getMarketlists = async (_req: Request, res: Response) => {
   try {
     const result = await pool.query(`
@@ -59,9 +56,8 @@ export const getMarketlists = async (_req: Request, res: Response) => {
   }
 };
 
-// ============================
+
 // Get marketlist by ID
-// ============================
 export const getMarketlistById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -101,9 +97,8 @@ export const getMarketlistById = async (req: Request, res: Response) => {
   }
 };
 
-// ============================
+
 // Create new marketlist
-// ============================
 export const createMarketlist = async (req: Request, res: Response) => {
   try {
     const {
@@ -147,9 +142,8 @@ export const createMarketlist = async (req: Request, res: Response) => {
   }
 };
 
-// ============================
+
 // Update marketlist
-// ============================
 export const updateMarketlist = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -197,9 +191,8 @@ export const updateMarketlist = async (req: Request, res: Response) => {
   }
 };
 
-// ============================
+
 // Delete marketlist
-// ============================
 export const deleteMarketlist = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;

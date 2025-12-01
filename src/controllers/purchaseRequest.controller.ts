@@ -6,9 +6,7 @@ interface AuthRequest extends Request {
   user?: { id: number; username: string; role: string };
 }
 
-// ======================================================
 // 🔧 Generate PR Number otomatis: PR-2025-0001
-// ======================================================
 async function generatePRNumber() {
   const year = new Date().getFullYear();
 
@@ -30,9 +28,7 @@ async function generatePRNumber() {
   return `PR-${year}-${seq.toString().padStart(4, "0")}`;
 }
 
-// ======================================================
 // ✅ Get all Purchase Requests (publik bisa akses)
-// ======================================================
 export const getPurchaseRequests = async (req: AuthRequest, res: Response) => {
   try {
     let result;
@@ -58,9 +54,7 @@ export const getPurchaseRequests = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// ======================================================
 // ✅ Get Purchase Request by ID (publik bisa akses)
-// ======================================================
 export const getPurchaseRequestById = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
@@ -84,9 +78,7 @@ export const getPurchaseRequestById = async (req: AuthRequest, res: Response) =>
   }
 };
 
-// ======================================================
 // ✅ Create Purchase Request (Admin/User, token wajib)
-// ======================================================
 export const createPurchaseRequest = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
@@ -152,9 +144,7 @@ export const createPurchaseRequest = async (req: AuthRequest, res: Response) => 
   }
 };
 
-// ======================================================
 // ✅ Update Purchase Request (Admin Only)
-// ======================================================
 export const updatePurchaseRequest = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user || req.user.role !== "admin") {
@@ -233,9 +223,7 @@ export const updatePurchaseRequest = async (req: AuthRequest, res: Response) => 
   }
 };
 
-// ======================================================
 // ❌ Delete Purchase Request (Admin Only)
-// ======================================================
 export const deletePurchaseRequest = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user || req.user.role !== "admin") {

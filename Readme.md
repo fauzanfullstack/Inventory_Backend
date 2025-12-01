@@ -1,92 +1,65 @@
-# 📝 Inventory (Pengelolaan Barang)
-Sistem Inventoy atau Pengelolaan barang yang menyediakan berbagai fitur pengelolaan barang seperti persediaan barang permintaan barang pengeluaran barang daftar barang keranjan barang dan report keseluruhan pengelolaan barang,serta menyediakan akses yang berbeda antara users(departemen lain) dan admin 
+📝 Inventory Management System (Pengelolaan Barang)
 
----
+Sistem Inventory yang menyediakan fitur pengelolaan barang seperti persediaan, permintaan, pengeluaran, daftar barang, keranjang barang, hingga laporan lengkap. Sistem juga mendukung role user & admin dengan level akses yang berbeda.
 
-📌 1. Tujuan Project
-- Menyediakan sistem yang memudahkan karyawan dalam pengelolaan pencatatan barang
-- Menjadi bahan pembelajaran dalam pengembangan system web
+📑 Daftar Isi
 
----
+🎯 Tujuan Project 📂 Fitur Utama 🛠️ Teknologi yang Digunakan 🚀 Proses Backend Singkat 🗃️ Struktur Folder 📡 Contoh Routes API 📸 Dokumentasi ERD 👤 Author
 
-## 📂 2. Fitur Utama
+🎯 Tujuan Project
 
-- 🔐 **Registrasi & Login**
-  - Login user & admin dengan role berbeda.
-  - Proteksi akses berdasarkan role.
+-Memudahkan admin & departemen lain dalam pengelolaan barang. =Mencatat alur barang dari permintaan, penerimaan, hingga pengeluaran. =Menjadi sarana pembelajaran pembuatan backend CRUD Full API menggunakan Node.js + PostgreSQL
 
-- 📦 **CRUD Items Barang**
-  - Menambah, mengubah, menghapus, dan melihat data barang.
-  - Atur part number, nama barang, kategori, dan stock awal.
+📂 Fitur Utama
 
-- 📝 **CRUD Purchase Request (PR)**
-  - Membuat form permintaan pembelian barang.
-  - Approve/Reject PR oleh admin.
-  - Tracking status PR.
+🔐 Auth & User Management -Registrasi & Login (Admin & User) -Akses dibatasi berdasarkan role -Protected routes
 
-- 🛒 **CRUD Purchase Request Items**
-  - Menambahkan item barang ke dalam PR.
-  - Pengaturan quantity dan unit.
+📦 Items Management -CRUD items barang -Part number, kategori, satuan, stok awal -Upload foto barang (opsional)
 
-- 🧾 **CRUD Market List**
-  - Mencatat daftar barang yang perlu dibeli berdasarkan PR.
-  - Monitoring list pembelian.
+📝 Purchase Request (PR) -Membuat PR untuk pembelian barang -Approve / Reject oleh admin -Tracking status -Print dokumen PR (PDF)
 
-- 📥 **CRUD Receiving**
-  - Mendata barang yang masuk dari supplier.
-  - Update stok otomatis setelah barang diterima.
+🛒 PR Items -Menambahkan item ke dalam PR -Mengatur qty dan unit
 
-- 📥 **CRUD Receiving Items**
-  - Input detail barang per receiving.
-  - Qty, kondisi barang, catatan penerimaan.
+🧾 Market List -Daftar barang yang perlu dibeli -Monitoring barang yang sedang dicari
 
-- 🏬 **CRUD Store Request**
-  - Permintaan barang dari gudang ke divisi internal.
-  - Admin menyetujui dan mempersiapkan barang.
+📥 Receiving -Pencatatan barang masuk dari supplier -Stok bertambah otomatis
 
-- 🧺 **CRUD Store Request Items**
-  - Item-item yang diminta dalam satu Store Request.
+📥 Receiving Items -Detail item penerimaan -Qty, kondisi, catatan
 
-- 📤 **CRUD Issuing**
-  - Proses pengeluaran barang dari gudang.
+🏬 Store Request -Permintaan barang internal dari divisi lain -Approval dan pengeluaran barang
 
-- 📤 **CRUD Issuing Items**
-  - Detail barang yang dikeluarkan.
-  - Stok otomatis berkurang.
+🧺 Store Request Items -Detail daftar barang yang diminta
 
-- 📊 **Report Stock Balance**
-  - Laporan jumlah stok terkini.
-  - Menampilkan pergerakan stok (in/out).
-  - Bisa difilter berdasarkan tanggal atau jenis pergerakan.
+📤 Issuing -Pengeluaran barang dari gudang -Stok berkurang otomatis
 
-- 🚪 **Logout**
-  - Mengakhiri sesi login dengan aman.
+📤 Issuing Items -Detail barang yang keluar
 
----
+📊 Stock Balance Report -Laporan stok terkini -Pergerakan stok (In/Out) -Filter tanggal, jenis transaksi, dll.
 
-## 🛠️ 3. Teknologi yang Digunakan
-- Express
-- Node.js/pnpm
-- PosgreSql
-- RestClient 
-- Postman
+🚪 Logout -Mengakhiri sesi dengan aman
 
----
+🛠️ Teknologi yang Digunakan Teknologi Deskripsi ⚡ Express.js Backend Framework 🟩 Node.js (pnpm) Runtime & package manager 🐘 PostgreSQL Database utama 📡 Postman/RestClient Testing API 🔐 JSON Web Token Autentikasi 🤖 AI Tools Debugging problem solving
 
-## ⚙️ 4. Prasyarat
-Sebelum menjalankan project, pastikan sudah menginstall:
+🚀 Proses Backend Singkat --BUAT TABEL DI POSGRES SQL SAYA KASIH ERD NYA SAJA KALAU PASTE QUERY NYA TERLALU PANJANG JUGA )
 
-- PHP 8+
-- Composer
-- Node.js & npm
-- Database (MySQL/PostgreSQL)
-- Git (optional)
+📌 1. Instalasi -pnpm init -pnpm add express -pnpm add typescript -D -pnpm tsc -npx tsc --init -pnpm add express cors dotenv -pnpm add -D @types/node @types/express @types/corsc
 
----
+📌 2. Membuat Server Dasar (src/app.ts) app.get("/", (req, res) => { res.send("Hello World! Backend Inventory berjalan!"); });
 
-## 🚀 5. Cara Install & Menjalankan Project
+📌 3. Membuat .env -PORT=5000
 
-### 🧩 Clone Repository
-```bash
-git clone https://github.com/username/nama-project.git
-cd nama-project
+🗃️ Struktur Folder INVENTORY-PROJECT/
+├── backend-inventory/ │ ├── dist/ │ ├── node_modules/ │ ├── src/ │ │ ├── controllers/ │ │ ├── database/ │ │ ├── middleware/ │ │ ├── routes/ │ │ └── app.ts │ ├── test/ │ ├── uploads/ │ ├── .env │ ├── nodemon.json │ ├── package.json │ ├── pnpm-lock.yaml │ ├── Readme.md │ └── tsconfig.json
+
+📌 Penjelasan Folder
+
+-controllers → fungsi CRUD, join, transform response JSON -database → koneksi PostgreSQL -middleware → login, register, Upload foto -routes → menghubungkan endpoint ke controller 📡 Contoh Routes API
+router.post("/", createIssuing); router.get("/", getIssuings); router.get("/:id", getIssuingById); router.put("/:id", updateIssuing); router.delete("/:id", deleteIssuing); -test → alat testing API sederhana -uploads → penyimpanan file foto
+
+pnpm run dev lalu akses http://localhost:5000/api/items maka akan muncul data json seperti ini { "id": "32", "part_no": "HTL-012", "name": "Conditioner 30ml", "supplier": "PT Aromatic Care", "unit_type": "pcs", "conversion": "1.0000", "unit": "barang", "qty": 151, "aksi_centang": true, "created_by": "Fauzan", "updated_by": null, "created_at": "2025-11-30T12:11:05.884Z", "updated_at": "2025-11-30T12:57:15.377Z" },
+
+📸 Dokumentasi ERD erd ozan
+
+🚀 Selesai!
+
+📌Penutup “Saya Fauzan Permana menyadari bahwa backend yang saya buat masih belum sepenuhnya kompleks dan belum dapat memenuhi seluruh aspek ideal sebuah sistem. Saya memohon maaf atas kekurangan tersebut. Dengan waktu pengerjaan yang cukup terbatas dan kemampuan yang masih terus saya pelajari, saya berusaha memberikan hasil terbaik yang saya bisa pada kondisi saat ini.”

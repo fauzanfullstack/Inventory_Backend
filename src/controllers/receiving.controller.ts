@@ -1,9 +1,7 @@
 import { Request, Response } from "express";
 import pool from "../database/postgress";
 
-// ================================
 // GET ALL
-// ================================
 export const getReceivings = async (_req: Request, res: Response) => {
   try {
     const result = await pool.query("SELECT * FROM receivings ORDER BY id DESC");
@@ -14,9 +12,7 @@ export const getReceivings = async (_req: Request, res: Response) => {
   }
 };
 
-// ================================
 // GET BY ID
-// ================================
 export const getReceivingById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -33,9 +29,7 @@ export const getReceivingById = async (req: Request, res: Response) => {
   }
 };
 
-// ================================
 // CREATE RECEIVING + AUTO UPDATE STOCK
-// ================================
 export const createReceiving = async (req: Request, res: Response) => {
   const client = await pool.connect();
   
@@ -146,9 +140,7 @@ export const createReceiving = async (req: Request, res: Response) => {
   }
 };
 
-// ================================
 // UPDATE RECEIVING + AUTO UPDATE STOCK
-// ================================
 export const updateReceiving = async (req: Request, res: Response) => {
   const client = await pool.connect();
 
@@ -311,9 +303,7 @@ export const updateReceiving = async (req: Request, res: Response) => {
   }
 };
 
-// ================================
 // DELETE RECEIVING
-// ================================
 export const deleteReceiving = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;

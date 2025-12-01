@@ -11,16 +11,16 @@ import { authenticateToken, isAdmin } from "../middleware/authMiddleware";
 
 const router: Router = express.Router();
 
-// ===============================
+
 // PUBLIC ROUTES
-// ===============================
+
 // REGISTER & LOGIN tetap publik
 router.post("/register", register);
 router.post("/login", login);
 
-// ===============================
+
 // PROTECTED ROUTES (Admin Only)
-// ===============================
+
 // GET ALL USERS → cuma admin yang bisa akses
 router.get("/users", authenticateToken, isAdmin, getUsers);
 
