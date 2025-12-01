@@ -15,76 +15,8 @@ Sistem juga mendukung role user & admin dengan level akses yang berbeda.
 👤 Author
 
 
-🎯 Tujuan Project
 
--Memudahkan admin & departemen lain dalam pengelolaan barang.
-=Mencatat alur barang dari permintaan, penerimaan, hingga pengeluaran.
-=Menjadi sarana pembelajaran pembuatan backend CRUD Full API menggunakan Node.js + PostgreSQL
-
-📂 Fitur Utama
-
-🔐 Auth & User Management
--Registrasi & Login (Admin & User)
--Akses dibatasi berdasarkan role
--Protected routes
-
-📦 Items Management
--CRUD items barang
--Part number, kategori, satuan, stok awal
--Upload foto barang (opsional)
-
-📝 Purchase Request (PR)
--Membuat PR untuk pembelian barang
--Approve / Reject oleh admin
--Tracking status
--Print dokumen PR (PDF)
-
-🛒 PR Items
--Menambahkan item ke dalam PR
--Mengatur qty dan unit
-
-🧾 Market List
--Daftar barang yang perlu dibeli
--Monitoring barang yang sedang dicari
-
-📥 Receiving
--Pencatatan barang masuk dari supplier
--Stok bertambah otomatis
-
-📥 Receiving Items
--Detail item penerimaan
--Qty, kondisi, catatan
-
-🏬 Store Request
--Permintaan barang internal dari divisi lain
--Approval dan pengeluaran barang
-
-🧺 Store Request Items
--Detail daftar barang yang diminta
-
-📤 Issuing
--Pengeluaran barang dari gudang
--Stok berkurang otomatis
-
-📤 Issuing Items
--Detail barang yang keluar
-
-📊 Stock Balance Report
--Laporan stok terkini
--Pergerakan stok (In/Out)
--Filter tanggal, jenis transaksi, dll.
-
-🚪 Logout
--Mengakhiri sesi dengan aman
-
-🛠️ Teknologi yang Digunakan
-Teknologi                                          Deskripsi
-⚡ Express.js	                                     Backend Framework
-🟩 Node.js (pnpm)	                                 Runtime & package manager
-🐘 PostgreSQL	                                     Database utama
-📡 Postman/RestClient	                             Testing API
-🔐 JSON Web Token	                                 Autentikasi
-🤖 AI Tools	Debugging                              problem solving
+                            problem solving
 
 🚀 Proses Backend Singkat
 --BUAT TABEL DI POSGRES SQL SAYA KASIH ERD NYA SAJA KALAU PASTE QUERY NYA TERLALU PANJANG JUGA )
@@ -107,7 +39,9 @@ app.get("/", (req, res) => {
 -PORT=5000
 
 🗃️ Struktur Folder
-INVENTORY-PROJECT/                                                                                    
+
+```
+INVENTORY-PROJECT/                                                                             
 ├── backend-inventory/
 │   ├── dist/
 │   ├── node_modules/
@@ -125,7 +59,7 @@ INVENTORY-PROJECT/
 │   ├── pnpm-lock.yaml
 │   ├── Readme.md
 │   └── tsconfig.json
-
+```
 
 📌 Penjelasan Folder
 

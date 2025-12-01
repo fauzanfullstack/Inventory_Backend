@@ -7,7 +7,9 @@ export const getPrItems = async (_req: Request, res: Response) => {
     const result = await pool.query(`
       SELECT 
         pr_items.*,
-        items.name AS item_name
+        items.name AS item_name,
+        items.part_no AS item_part_no,
+        items.unit_type AS item_unit_type
       FROM pr_items
       LEFT JOIN items ON items.id = pr_items.item_id
       ORDER BY pr_items.id DESC
@@ -27,7 +29,9 @@ export const getPrItemById = async (req: Request, res: Response) => {
     const result = await pool.query(`
       SELECT 
         pr_items.*,
-        items.name AS item_name
+        items.name AS item_name,
+        items.part_no AS item_part_no,
+        items.unit_type AS item_unit_type
       FROM pr_items
       LEFT JOIN items ON items.id = pr_items.item_id
       WHERE pr_items.id = $1
@@ -63,7 +67,23 @@ export const createPrItem = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Purchase Request not found" });
     }
 
-    const { item_id, part_no, description, unit_type, qty, cost } = pr.rows[0];
+    let { item_id, part_no, description, unit_type, qty, cost } = pr.rows[0];
+
+    // ✅ Jika ada item_id, ambil name, part_no, unit_type dari items
+    if (item_id) {
+      const itemResult = await pool.query(
+        "SELECT name, part_no, unit_type FROM items WHERE id = $1",
+        [item_id]
+      );
+
+      if (itemResult.rows.length > 0) {
+        const itemData = itemResult.rows[0];
+        // Prioritas: data dari items > data dari PR
+        part_no = itemData.part_no || part_no;
+        description = itemData.name || description; // ✅ Gunakan name dari items
+        unit_type = itemData.unit_type || unit_type;
+      }
+    }
 
     const result = await pool.query(
       `INSERT INTO pr_items 
@@ -93,7 +113,23 @@ export const createPrItem = async (req: Request, res: Response) => {
 export const updatePrItem = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { purchase_request_id, item_id, part_no, description, unit_type, qty, cost } = req.body;
+    let { purchase_request_id, item_id, part_no, description, unit_type, qty, cost } = req.body;
+
+    // ✅ Jika item_id diubah/ada, ambil data dari items
+    if (item_id) {
+      const itemResult = await pool.query(
+        "SELECT name, part_no, unit_type FROM items WHERE id = $1",
+        [item_id]
+      );
+
+      if (itemResult.rows.length > 0) {
+        const itemData = itemResult.rows[0];
+        // Update dengan data dari items jika tidak ada input manual
+        part_no = part_no || itemData.part_no;
+        description = description || itemData.name; // ✅ Gunakan name dari items
+        unit_type = unit_type || itemData.unit_type;
+      }
+    }
 
     const result = await pool.query(
       `UPDATE pr_items 

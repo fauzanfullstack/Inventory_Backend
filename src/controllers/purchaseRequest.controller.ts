@@ -28,23 +28,45 @@ async function generatePRNumber() {
   return `PR-${year}-${seq.toString().padStart(4, "0")}`;
 }
 
-// ✅ Get all Purchase Requests (publik bisa akses)
+// ✅ Get all Purchase Requests dengan JOIN items untuk ambil name
 export const getPurchaseRequests = async (req: AuthRequest, res: Response) => {
   try {
     let result;
 
     if (req.user?.role === "admin") {
-      // Admin → semua PR
-      result = await pool.query("SELECT * FROM purchase_requests ORDER BY id DESC");
+      // Admin → semua PR dengan JOIN items
+      result = await pool.query(`
+        SELECT 
+          pr.*,
+          i.name as item_name,
+          i.part_no as item_part_no
+        FROM purchase_requests pr
+        LEFT JOIN items i ON pr.item_id = i.id
+        ORDER BY pr.id DESC
+      `);
     } else if (req.user) {
-      // User → hanya PR miliknya
-      result = await pool.query(
-        "SELECT * FROM purchase_requests WHERE created_by=$1 ORDER BY id DESC",
-        [req.user.id]
-      );
+      // User → hanya PR miliknya dengan JOIN items
+      result = await pool.query(`
+        SELECT 
+          pr.*,
+          i.name as item_name,
+          i.part_no as item_part_no
+        FROM purchase_requests pr
+        LEFT JOIN items i ON pr.item_id = i.id
+        WHERE pr.created_by=$1 
+        ORDER BY pr.id DESC
+      `, [req.user.id]);
     } else {
-      // Publik → tampilkan semua PR
-      result = await pool.query("SELECT * FROM purchase_requests ORDER BY id DESC");
+      // Publik → tampilkan semua PR dengan JOIN items
+      result = await pool.query(`
+        SELECT 
+          pr.*,
+          i.name as item_name,
+          i.part_no as item_part_no
+        FROM purchase_requests pr
+        LEFT JOIN items i ON pr.item_id = i.id
+        ORDER BY pr.id DESC
+      `);
     }
 
     res.json(result.rows);
@@ -54,11 +76,20 @@ export const getPurchaseRequests = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// ✅ Get Purchase Request by ID (publik bisa akses)
+// ✅ Get Purchase Request by ID dengan JOIN items
 export const getPurchaseRequestById = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const result = await pool.query("SELECT * FROM purchase_requests WHERE id = $1", [id]);
+    const result = await pool.query(`
+      SELECT 
+        pr.*,
+        i.name as item_name,
+        i.part_no as item_part_no,
+        i.unit_type as item_unit_type
+      FROM purchase_requests pr
+      LEFT JOIN items i ON pr.item_id = i.id
+      WHERE pr.id = $1
+    `, [id]);
 
     if (result.rowCount === 0) {
       return res.status(404).json({ message: "Purchase request not found" });
@@ -67,7 +98,6 @@ export const getPurchaseRequestById = async (req: AuthRequest, res: Response) =>
     const pr = result.rows[0];
 
     if (!req.user || req.user?.role === "admin" || pr.created_by === req.user.id) {
-      // Publik / Admin / user pemilik → boleh akses
       return res.json(pr);
     }
 
